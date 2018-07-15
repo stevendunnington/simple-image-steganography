@@ -78,12 +78,13 @@ public class Driver extends Application
 		decodedField.setPrefHeight(50);
 		//decodedField.setAlignment(Pos.BASELINE_LEFT);
 		
-		HBox openBtnBox = new HBox();
-		openBtnBox.setAlignment(Pos.TOP_LEFT);
-		HBox saveBtnBox = new HBox();
-		saveBtnBox.setAlignment(Pos.BOTTOM_RIGHT);
-		openBtnBox.getChildren().addAll(openImgBtn, openFileBtn, encodeFileBtn, decodeBtn, saveImgBtn, saveFileBtn);
-		root.setBottom(openBtnBox);
+		HBox btnBox = new HBox();
+		btnBox.getChildren().addAll(openImgBtn, openFileBtn, encodeFileBtn, decodeBtn, saveImgBtn, saveFileBtn);
+		
+		Label status = new Label("Open an image or text file.");
+		VBox botBox = new VBox();
+		botBox.getChildren().addAll(status, btnBox);
+		root.setBottom(botBox);
 		
 		
 		ImageView openedImageView = new ImageView();
@@ -98,6 +99,8 @@ public class Driver extends Application
 		//openedImageLabel.setDisable(true);
 		Label encodedImageLabel = new Label();
 		//encodedImageLabel.setDisable(true);
+		
+		
         
         VBox openedImgVBox = new VBox();
         openedImgVBox.getChildren().addAll(openedImageView, openedImageLabel);
@@ -136,6 +139,7 @@ public class Driver extends Application
 					if(hasText)
 						encodeFileBtn.setDisable(false);
 					decodeBtn.setDisable(false);
+					status.setText("Image opened successfully.");
 						
 				} catch (IOException | NullPointerException e1) {
 					hasImage = false; //ensure hasIMage is still set to false
@@ -171,7 +175,7 @@ public class Driver extends Application
 					if(hasImage)
 						encodeFileBtn.setDisable(false);
 						
-					//System.out.println(inputString);
+					status.setText("Text file opened successfully.");
 				} catch (IOException e1) {
 					hasText = false;
 					alert.setTitle("File Error");
@@ -196,6 +200,8 @@ public class Driver extends Application
 				Image img = SwingFXUtils.toFXImage(encodedImage, null);
 				encodedImageView.setImage(img);
 				encodedImageLabel.setText("Encoded Image");
+				
+				status.setText("Text encoded successfully.");
 	        }
 		});
 		
@@ -213,6 +219,7 @@ public class Driver extends Application
 				if (save != null) {
 	                try {
 	                    ImageIO.write(encodedImage, "bmp", save);
+	                    status.setText("Image saved successfully.");
 	                } catch (IOException ex) {
 	                    System.out.println("Failed to save file");
 	                }
@@ -230,7 +237,7 @@ public class Driver extends Application
 				
 				//get a preview of the decoded string for the textfield
 				String prev = "";
-				for(int i = 0; i < 100; i++)
+				for(int i = 0; i < 30; i++)
 				{
 					if(i >= decodedString.length())
 						break; //exit the loop
@@ -238,6 +245,7 @@ public class Driver extends Application
 				}
 				
 				decodedField.setText(prev);
+				status.setText("Text decoded successfully.");
 			}
 			
 		});
@@ -258,6 +266,7 @@ public class Driver extends Application
 	                    PrintWriter pw = new PrintWriter(save);
 	                    pw.print(decodedString);
 	                    pw.close();
+	                    status.setText("Text file saved successfully.");
 	                } catch (IOException ex) {
 	                    System.out.println("Failed to save file");
 	                }
