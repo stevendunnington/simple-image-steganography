@@ -22,6 +22,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -31,7 +32,6 @@ import javafx.scene.control.TextField;
 
 public class Driver extends Application
 {
-	
 	private static BufferedImage openedImage;
 	private static boolean hasImage = false;
 	private static boolean hasText = false;
@@ -46,17 +46,17 @@ public class Driver extends Application
 	@Override
     public void start(Stage primaryStage)
 	{
-        primaryStage.setTitle("Text Encoder");
+        primaryStage.setTitle("Simple Image Steganography");
 		
         int xRes = 700;
         int yRes = 700;
         
-        BorderPane root = new BorderPane();
-        
+        BorderPane root = new BorderPane();   
         primaryStage.setScene(new Scene(root, xRes, yRes));
         primaryStage.show();
 		
-		
+		Button instructions = new Button("Instructions");
+        
 		Button openImgBtn = new Button("Open Image");
 		Button saveImgBtn = new Button("Save Image");
 		saveImgBtn.setDisable(true); //disable the save button until an encoded image is ready to be saved
@@ -73,19 +73,16 @@ public class Driver extends Application
 		Button decodeBtn = new Button("Decode Text From File");
 		decodeBtn.setDisable(true);
 		
-		TextField decodedField = new TextField();
-		decodedField.setMaxWidth(500);
-		decodedField.setPrefHeight(50);
-		//decodedField.setAlignment(Pos.BASELINE_LEFT);
+		Text decodedText = new Text();
+		root.setLeft(decodedText);
 		
 		HBox btnBox = new HBox();
-		btnBox.getChildren().addAll(openImgBtn, openFileBtn, encodeFileBtn, decodeBtn, saveImgBtn, saveFileBtn);
+		btnBox.getChildren().addAll(openImgBtn, openFileBtn, encodeFileBtn, decodeBtn, saveImgBtn, saveFileBtn, instructions);
 		
 		Label status = new Label("Open an image or text file.");
 		VBox botBox = new VBox();
 		botBox.getChildren().addAll(status, btnBox);
 		root.setBottom(botBox);
-		
 		
 		ImageView openedImageView = new ImageView();
         openedImageView.setPreserveRatio(true);
@@ -96,12 +93,8 @@ public class Driver extends Application
         encodedImageView.setFitWidth(300);
         
 		Label openedImageLabel = new Label();
-		//openedImageLabel.setDisable(true);
 		Label encodedImageLabel = new Label();
-		//encodedImageLabel.setDisable(true);
-		
-		
-        
+
         VBox openedImgVBox = new VBox();
         openedImgVBox.getChildren().addAll(openedImageView, openedImageLabel);
         VBox encodedImgVBox = new VBox();
@@ -112,10 +105,29 @@ public class Driver extends Application
         imageBox.setAlignment(Pos.BASELINE_CENTER);
 		root.setTop(imageBox);
 		
-		root.setCenter(decodedField);
+
 		
 		Alert alert = new Alert(AlertType.INFORMATION);
 
+		//display instructions
+		instructions.setOnAction(new EventHandler<ActionEvent>()
+		{
+			@Override public void handle(ActionEvent e)
+				{
+					alert.setTitle("Instructions");
+			        alert.setHeaderText(null);
+			        String instr = "Open Image: Open an image from the file system. The image can be either an encoded image, or a regular non-encoede image.\n"
+			        		+ "Open Text File: Opens a text file with text to be encoded. Supports .txt files.\n"
+			        		+"Encode Text From Image: Encodes the text from the text file into the opened image, and displays the "
+			        		+ "encoded image.\nDecode Text From Text File: Decodes any encoded text from an image and displays a preview. May decode nonsense if the image has not been encoded with text.\n"
+			        		+ "Save Image: Saves a copy of the encoded image as a .bmp file.\n"
+			        		+ "Save Text File: Saves a copy of the decoded text as a .txt file.";
+			        alert.setContentText(instr);
+			        alert.show();
+				}
+		});
+		
+		
         //open image
 		openImgBtn.setOnAction(new EventHandler<ActionEvent>()
 		{
@@ -237,14 +249,14 @@ public class Driver extends Application
 				
 				//get a preview of the decoded string for the textfield
 				String prev = "";
-				for(int i = 0; i < 30; i++)
+				for(int i = 0; i < 50; i++)
 				{
 					if(i >= decodedString.length())
 						break; //exit the loop
 					prev += decodedString.charAt(i);
 				}
 				
-				decodedField.setText(prev);
+				decodedText.setText("Sample Decoded Text:\n" + prev);
 				status.setText("Text decoded successfully.");
 			}
 			

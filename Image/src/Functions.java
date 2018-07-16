@@ -10,7 +10,7 @@ public class Functions
 		
 		input += (char)3; //append the end of text character to the end of the string, which has an ASCII value of 3
 		//System.out.println("input = " + input);
-		int length = input.length();// + 1; //add 1 to ensure there is room to concatenate the value for how many of the RGB pixels are used for the encoding
+		int length = input.length();
 		float bitsNeeded = length * 7;
 		int bitsPerPixel = (int) Math.ceil(bitsNeeded / numPixels);
 
@@ -209,7 +209,6 @@ public class Functions
 		
 		int width = img.getWidth();
 		int height = img.getHeight();
-		//int numPixels = width * height;
 		
 		int currentInt = 0;
 		int currentBit;
@@ -222,12 +221,7 @@ public class Functions
 			currentBit = firstPixel >> i;
 			currentBit = currentBit & 1;
 			bitsPerPixel += (1 << i) * currentBit;
-		//	System.out.println(bitsPerPixel);
-
 		}
-		
-		
-	//	System.out.println("bits per pixel = " + bitsPerPixel);
 		
 		int redBits = 0;
 		int greenBits = 0;
