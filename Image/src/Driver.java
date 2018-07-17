@@ -29,8 +29,8 @@ import javafx.scene.control.Label;
 public class Driver extends Application
 {
 	private static BufferedImage openedImage;
-	private static boolean hasImage = false;
-	private static boolean hasText = false;
+	private static boolean hasImage = false; //true if an image has been opened
+	private static boolean hasText = false; //true if a text file has been opened
 	private static BufferedImage encodedImage;
 	private static String inputString;
 	private static String decodedString;
@@ -144,21 +144,21 @@ public class Driver extends Application
 					openedImageLabel.setText("Opened Image");
 					
 					hasImage = true;
-					if(hasText)
-						encodeFileBtn.setDisable(false);
+					if(hasText) //if a text file has already been opened, image is ready to be encoded
+						encodeFileBtn.setDisable(false); //enables the encode file button
 					decodeBtn.setDisable(false);
-					status.setText("Image opened successfully.");
+					status.setText("Image opened successfully."); //update the status
 						
 				} catch (IOException | NullPointerException e1) {
 					hasImage = false; //ensure hasImage is still set to false
+					//display alert notifying the user of an error
 			        alert.setTitle("File Error");
 			        alert.setHeaderText(null);
 			        alert.setContentText("Error reading file, please open only standard image file types.");
 			        alert.show();
 				} catch(IllegalArgumentException e2)
 				{
-					//results from closing the file chooser, not a real error
-					
+					//results from closing the file chooser, not an error that requires a notification		
 				}
 				
 	        }
@@ -169,8 +169,9 @@ public class Driver extends Application
 		{
 			@Override public void handle(ActionEvent e)
 	        {
+				//open text file form file explorer
 				FileChooser fileChooser = new FileChooser();
-				fileChooser.setTitle("Open Image");
+				fileChooser.setTitle("Open Text File");
 				ExtensionFilter filter = new FileChooser.ExtensionFilter("TXT File (*.txt)", "*.txt");
 	            fileChooser.getExtensionFilters().add(filter);
 				
@@ -180,19 +181,20 @@ public class Driver extends Application
 			    	inputString = source.read();
 					
 					hasText = true;
-					if(hasImage)
-						encodeFileBtn.setDisable(false);
-						
-					status.setText("Text file opened successfully.");
+					if(hasImage) //if an image has already been opened, image is ready to be encoded
+						encodeFileBtn.setDisable(false); //enables the encode file button					
+					status.setText("Text file opened successfully."); //update the status
+					
 				} catch (IOException e1) {
 					hasText = false;
+					//display alert notifying the user of an error
 					alert.setTitle("File Error");
 				    alert.setHeaderText(null);
 				    alert.setContentText("Error reading file, please open only text file types.");
 				    alert.show();
 				} catch(IllegalArgumentException | NullPointerException e2)
 				{
-					//results from closing the file chooser, not a real error
+					//results from closing the file chooser, not an error that requires a notification
 				}
 	        }
 		});
@@ -202,14 +204,26 @@ public class Driver extends Application
 		{
 			@Override public void handle(ActionEvent e)
 	        {
-				encodedImage = Functions.encode(openedImage, inputString);
-				saveImgBtn.setDisable(false);
-				
-				Image img = SwingFXUtils.toFXImage(encodedImage, null);
-				encodedImageView.setImage(img);
-				encodedImageLabel.setText("Encoded Image");
-				
-				status.setText("Text encoded successfully.");
+				encodedImage = Functions.encode(openedImage, inputString); //get the encoded image
+				if(encodedImage != null)
+				{
+					saveImgBtn.setDisable(false); //image is ready to be saved
+					
+					//display the image
+					Image img = SwingFXUtils.toFXImage(encodedImage, null);
+					encodedImageView.setImage(img);
+					encodedImageLabel.setText("Encoded Image");
+					
+					status.setText("Text encoded successfully."); //update the status
+				}
+				else //returned image is null, thus the text file was too large to be encoded into the image
+				{
+					//display alert notifying the user of an error
+					alert.setTitle("Encoding Error");
+				    alert.setHeaderText(null);
+				    alert.setContentText("Text file it too large to be encoded into the opened image. Please try opening a smaller text file or a larger image.");
+				    alert.show();
+				}
 	        }
 		});
 		
@@ -218,9 +232,10 @@ public class Driver extends Application
 		{
 			@Override public void handle(ActionEvent e)
 	        {
+				//save image using the file explorer
 				FileChooser fileChooser = new FileChooser();
 				fileChooser.setTitle("Save Image");
-				ExtensionFilter filter = new FileChooser.ExtensionFilter("BMP File (*.bmp)", "*.bmp");
+				ExtensionFilter filter = new FileChooser.ExtensionFilter("BMP File (*.bmp)", "*.bmp"); //saves as a bmp to prevent any loss of data
 	            fileChooser.getExtensionFilters().add(filter);
 				File save = fileChooser.showSaveDialog(primaryStage);
 
@@ -229,7 +244,11 @@ public class Driver extends Application
 	                    ImageIO.write(encodedImage, "bmp", save);
 	                    status.setText("Image saved successfully.");
 	                } catch (IOException ex) {
-	                    System.out.println("Failed to save file");
+	                	//display alert notifying the user of an error
+				        alert.setTitle("File Error");
+				        alert.setHeaderText(null);
+				        alert.setContentText("Failed to save file.");
+				        alert.show();
 	                }
 				}
 	        }
@@ -241,7 +260,7 @@ public class Driver extends Application
 			@Override public void handle(ActionEvent e)
 			{
 				decodedString = Functions.decode(openedImage);
-				saveTextBtn.setDisable(false);
+				saveTextBtn.setDisable(false); //decoded text is ready to be saved as a text file, enables the save text button
 				
 				//get a preview of the decoded string for the textfield
 				String prev = "";
@@ -252,8 +271,8 @@ public class Driver extends Application
 					prev += decodedString.charAt(i);
 				}
 				
-				decodedText.setText("Sample Decoded Text:\n" + prev);
-				status.setText("Text decoded successfully.");
+				decodedText.setText("Sample Decoded Text:\n" + prev); //displays the sample of the text
+				status.setText("Text decoded successfully."); //updates the status
 			}
 			
 		});
@@ -263,8 +282,9 @@ public class Driver extends Application
 		{
 			@Override public void handle(ActionEvent e)
 			{
+				//saves the text file using file chooser
 				FileChooser fileChooser = new FileChooser();
-				fileChooser.setTitle("Save Image");
+				fileChooser.setTitle("Save Text File");
 				ExtensionFilter filter = new FileChooser.ExtensionFilter("Text File (*.txt)", "*.txt");
 	            fileChooser.getExtensionFilters().add(filter);
 				File save = fileChooser.showSaveDialog(primaryStage);
@@ -276,7 +296,11 @@ public class Driver extends Application
 	                    pw.close();
 	                    status.setText("Text file saved successfully.");
 	                } catch (IOException ex) {
-	                    System.out.println("Failed to save file");
+	                    //display alert notifying the user of an error
+				        alert.setTitle("File Error");
+				        alert.setHeaderText(null);
+				        alert.setContentText("Error saving file.");
+				        alert.show();
 	                }
 				}
 			}

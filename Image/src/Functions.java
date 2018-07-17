@@ -30,8 +30,8 @@ public class Functions
 		
 		if(bitsNeeded > numPixels*24 - 1)
 		{
-			System.out.println("Not enough pixels to encode message");
-			System.exit(0);
+			//not enough pixels in the image to encode the message
+			return null;
 		}
 		
 		int stringBitCounter = 0;
