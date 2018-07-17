@@ -2,11 +2,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import com.google.common.base.Charsets;
 import com.google.common.io.CharSource;
 import com.google.common.io.Files;
-
 import javax.imageio.ImageIO;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -27,8 +25,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-
 
 public class Driver extends Application
 {
@@ -48,6 +44,7 @@ public class Driver extends Application
 	{
         primaryStage.setTitle("Simple Image Steganography");
 		
+        //window is set to 700x700 pixels
         int xRes = 700;
         int yRes = 700;
         
@@ -55,59 +52,59 @@ public class Driver extends Application
         primaryStage.setScene(new Scene(root, xRes, yRes));
         primaryStage.show();
 		
+        //various javafx objects are added
 		Button instructions = new Button("Instructions");
         
 		Button openImgBtn = new Button("Open Image");
 		Button saveImgBtn = new Button("Save Image");
-		saveImgBtn.setDisable(true); //disable the save button until an encoded image is ready to be saved
+		saveImgBtn.setDisable(true); //disable the save image button until an encoded image is ready to be saved
 		
 		Button openFileBtn = new Button("Open Text File");
-		Button saveFileBtn = new Button("Save Text File");
-		saveFileBtn.setDisable(true);
+		Button saveTextBtn = new Button("Save Text File");
+		saveTextBtn.setDisable(true); //disable the save text button until text has been decoded
 		
 		Button encodeFileBtn = new Button("Encode Text From File");
-		encodeFileBtn.setDisable(true);
-		Button encodeTextBtn = new Button("Encode Text From Text Box");
-		encodeTextBtn.setDisable(true);
+		encodeFileBtn.setDisable(true); //disable the encode file until both an image and a text file are loaded
 		
 		Button decodeBtn = new Button("Decode Text From File");
-		decodeBtn.setDisable(true);
+		decodeBtn.setDisable(true); //disable the decode text button until an image has been loaded
 		
-		Text decodedText = new Text();
-		root.setLeft(decodedText);
+		Text decodedText = new Text(); //text object to display sample of decoded text
 		
-		HBox btnBox = new HBox();
-		btnBox.getChildren().addAll(openImgBtn, openFileBtn, encodeFileBtn, decodeBtn, saveImgBtn, saveFileBtn, instructions);
+		HBox btnBox = new HBox(); //HBox for all of the buttons
+		btnBox.getChildren().addAll(openImgBtn, openFileBtn, encodeFileBtn, decodeBtn, saveImgBtn, saveTextBtn, instructions);
 		
 		Label status = new Label("Open an image or text file.");
-		VBox botBox = new VBox();
+		//add the status label on top of the buttons
+		VBox botBox = new VBox(); 
 		botBox.getChildren().addAll(status, btnBox);
-		root.setBottom(botBox);
-		
+	
+		//create image views for the opened image and the encoded image
 		ImageView openedImageView = new ImageView();
         openedImageView.setPreserveRatio(true);
-        openedImageView.setFitWidth(300);
-                
+        openedImageView.setFitWidth(300); //300 pixels wide
     	ImageView encodedImageView = new ImageView();
         encodedImageView.setPreserveRatio(true);
         encodedImageView.setFitWidth(300);
         
+        //add labels to the ImageViews
 		Label openedImageLabel = new Label();
 		Label encodedImageLabel = new Label();
-
         VBox openedImgVBox = new VBox();
         openedImgVBox.getChildren().addAll(openedImageView, openedImageLabel);
         VBox encodedImgVBox = new VBox();
         encodedImgVBox.getChildren().addAll(encodedImageView, encodedImageLabel);
-        
+        //set the images next to each other in a HBox
         HBox imageBox = new HBox();
         imageBox.getChildren().addAll(openedImgVBox, encodedImgVBox);
         imageBox.setAlignment(Pos.BASELINE_CENTER);
+        
+        //set the objects to proper positions in the BorderPane
+    	root.setBottom(botBox);
+    	root.setLeft(decodedText);
 		root.setTop(imageBox);
-		
 
-		
-		Alert alert = new Alert(AlertType.INFORMATION);
+		Alert alert = new Alert(AlertType.INFORMATION); //alert for pop-up information
 
 		//display instructions
 		instructions.setOnAction(new EventHandler<ActionEvent>()
@@ -133,7 +130,6 @@ public class Driver extends Application
 		{
 			@Override public void handle(ActionEvent e)
 	        {
-				//System.out.println("Opening image");
 				//open image from file explorer
 				FileChooser fileChooser = new FileChooser();
 				fileChooser.setTitle("Open Image");
@@ -154,7 +150,7 @@ public class Driver extends Application
 					status.setText("Image opened successfully.");
 						
 				} catch (IOException | NullPointerException e1) {
-					hasImage = false; //ensure hasIMage is still set to false
+					hasImage = false; //ensure hasImage is still set to false
 			        alert.setTitle("File Error");
 			        alert.setHeaderText(null);
 			        alert.setContentText("Error reading file, please open only standard image file types.");
@@ -245,7 +241,7 @@ public class Driver extends Application
 			@Override public void handle(ActionEvent e)
 			{
 				decodedString = Functions.decode(openedImage);
-				saveFileBtn.setDisable(false);
+				saveTextBtn.setDisable(false);
 				
 				//get a preview of the decoded string for the textfield
 				String prev = "";
@@ -263,7 +259,7 @@ public class Driver extends Application
 		});
 
 		//save decoded text as a text file
-		saveFileBtn.setOnAction(new EventHandler<ActionEvent>()
+		saveTextBtn.setOnAction(new EventHandler<ActionEvent>()
 		{
 			@Override public void handle(ActionEvent e)
 			{
