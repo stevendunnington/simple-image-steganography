@@ -45,12 +45,12 @@ public class Functions
 		
 	
 		
-		int stringBitCounter = 0;
-		int currentStringBit = 0; 
+		int stringBitCounter = 0; //total number of bits that have been encoded
+		int currentStringBit = 0; //current bit for the string
 		
-		int newPixelValue = 0;
-		int currentPixelBit = 0;
-		int currentPixel;
+		int newPixelValue = 0; //new pixel value to be used
+		int currentPixelBit = 0; //current bit for the pixel value
+		int currentPixel; //current pixel that is being encoded
 		
 		//NOTE: the pixel at (0,0) is exclusively used to encode the number of bits per pixel, this helps make the decoding process easier
 		
@@ -143,8 +143,8 @@ public class Functions
 						if(currentPixelBit == 1) //pixel bit should be changed to a 0, to match the string bit
 						{
 							newPixelValue = currentPixel - (1 << (g + 8)); //1 << (g + 8) is 2^(g + 8)
-							img.setRGB(currentWidth, currentHeight, newPixelValue);
-							currentPixel = newPixelValue;
+							img.setRGB(currentWidth, currentHeight, newPixelValue); //updates the pixel value
+							currentPixel = newPixelValue; //updates the currentPixel variable
 						}
 					}
 					else //currentStringBit == 1
@@ -152,8 +152,8 @@ public class Functions
 						if(currentPixelBit == 0) //pixel bit should be changed to a 1, to match the string bit
 						{
 							newPixelValue = currentPixel + (1 << (g + 8)); //1 << (g + 8) is 2^(g + 8)
-							img.setRGB(currentWidth, currentHeight, newPixelValue);
-							currentPixel = newPixelValue;
+							img.setRGB(currentWidth, currentHeight, newPixelValue); //updates the pixel value
+							currentPixel = newPixelValue; //updates the currentPixel variable
 						}
 					}
 					stringBitCounter++;
@@ -179,8 +179,8 @@ public class Functions
 						if(currentPixelBit == 1) //pixel bit should be changed to a 0, to match the string bit
 						{
 							newPixelValue = currentPixel - (1 << b); //1 << b is 2^b
-							img.setRGB(currentWidth, currentHeight, newPixelValue);
-							currentPixel = newPixelValue;
+							img.setRGB(currentWidth, currentHeight, newPixelValue); //updates the pixel value
+							currentPixel = newPixelValue; //updates the currentPixel variable
 						}
 					}
 					else //currentStringBit == 1
@@ -188,8 +188,8 @@ public class Functions
 						if(currentPixelBit == 0) //pixel bit should be changed to a 1, to match the string bit
 						{
 							newPixelValue = currentPixel + (1 << b); //1 << b is 2^b
-							img.setRGB(currentWidth, currentHeight, newPixelValue);
-							currentPixel = newPixelValue;
+							img.setRGB(currentWidth, currentHeight, newPixelValue); //updates the pixel value
+							currentPixel = newPixelValue; //updates the currentPixel variable
 						}
 					}
 					stringBitCounter++;
