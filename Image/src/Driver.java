@@ -26,6 +26,14 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
+/*
+ * Class: ImgSteg.java
+ * Purpose:
+ * This class contains everything related to the GUI of the application, as well as
+ * user input and output of pictures and text files. The main method is contained in this
+ * class as well.
+ */
+
 public class Driver extends Application
 {
 	private static BufferedImage openedImage;

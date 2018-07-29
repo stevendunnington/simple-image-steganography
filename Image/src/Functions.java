@@ -1,23 +1,38 @@
 import java.awt.image.BufferedImage;
 
+/*
+ * Class: Functions.java
+ * Purpose:
+ * This class contains two methods, encode and decode. These two
+ * methods perform the actual encoding of text into an image, and the decoding
+ * of text from an image.
+ */
 public class Functions
 {
-	public static BufferedImage encode(BufferedImage img, String input)
+	public static BufferedImage encode(BufferedImage img, String input) //used to encode an image with a String input
 	{
-		int width = img.getWidth();
+		int width = img.getWidth(); 
 		int height = img.getHeight();
-		int numPixels = width * height;
+		int numPixels = width * height; //number of pixels in the image
 		
 		input += (char)3; //append the end of text character to the end of the string, which has an ASCII value of 3
-		//System.out.println("input = " + input);
-		int length = input.length();
-		float bitsNeeded = length * 7;
-		int bitsPerPixel = (int) Math.ceil(bitsNeeded / numPixels);
+		int length = input.length(); //length of the String input
+		float bitsNeeded = length * 7; //the basic ASCII set is used, which uses 7 bits per character, thus we need length * 7 total bits to encode the string
+		
+		if(bitsNeeded > numPixels*24 - 1) //the 24 comes from 8*3, 3 colors (red, green, blue) and 8 bits are used for each color
+		{
+			//not enough pixels in the image to encode the message
+			return null;
+		}
+		
+		//compute the number of bits per pixel that we will be using to encode the String
+		int bitsPerPixel = (int) Math.ceil(bitsNeeded / numPixels); 
 
 		
 		int redBits = 0;
 		int greenBits = 0;
 		int blueBits = 0;
+		//cycle through and ensure that no bit color has a difference of more than 1 with any other color
 		for(int modCounter = 0; modCounter < bitsPerPixel; modCounter++)
 		{
 			if(modCounter % 3 == 0)
@@ -28,11 +43,7 @@ public class Functions
 				blueBits++;
 		}
 		
-		if(bitsNeeded > numPixels*24 - 1)
-		{
-			//not enough pixels in the image to encode the message
-			return null;
-		}
+	
 		
 		int stringBitCounter = 0;
 		int currentStringBit = 0; 
@@ -41,32 +52,35 @@ public class Functions
 		int currentPixelBit = 0;
 		int currentPixel;
 		
+		//NOTE: the pixel at (0,0) is exclusively used to encode the number of bits per pixel, this helps make the decoding process easier
+		
 		//encode the number of bits used per pixel in the blue part of the first pixel at (0, 0)
 		currentPixel = img.getRGB(0,  0);
-		for(int i = 0; i < 5; i++) //max possible bits per pixel is 24, only need to loop 5 times
+		for(int i = 0; i < 5; i++) //max possible bits per pixel is 24, only need to loop 5 times since 2^5=32, which is greater than 24
 		{
-			currentStringBit = (bitsPerPixel >> i) & 1; 
-			currentPixelBit = (currentPixel >> i) & 1;
+			currentStringBit = (bitsPerPixel >> i) & 1; //grabs the current bit of the string (in this case the string is bitsPerPixel)
+			currentPixelBit = (currentPixel >> i) & 1; //grabs the current pixel bit
 			if(currentStringBit == 0)
 			{
-				if(currentPixelBit == 1) //pixel bit should be changed to a 0
+				if(currentPixelBit == 1) //pixel bit should be changed to a 0, to match the string bit
 				{
-					newPixelValue = currentPixel - (1 << i); //1 << b is 2^b
-					img.setRGB(0, 0, newPixelValue);
-					currentPixel = newPixelValue;
+					newPixelValue = currentPixel - (1 << i); //1 << i is 2^i
+					img.setRGB(0, 0, newPixelValue); //updates the pixel value
+					currentPixel = newPixelValue; //updates the currentPixel variable
 				}
 			}
 			else //currentStringBit == 1
 			{
-				if(currentPixelBit == 0) //pixel bit should be changed to a 1
+				if(currentPixelBit == 0) //pixel bit should be changed to a 1, to match the string bit
 				{
 					newPixelValue = currentPixel + (1 << i); //1 << b is 2^b
-					img.setRGB(0, 0, newPixelValue);
-					currentPixel = newPixelValue;
+					img.setRGB(0, 0, newPixelValue); //updates the pixel value
+					currentPixel = newPixelValue; //updates the currentPixel variable
 				}
 			}
 		}
 		
+		//encode the String input, skipping the pixel at (0, 0)
 		for(int currentHeight = 0; currentHeight < height; currentHeight++) //loop through each row
 		{
 			for(int currentWidth = 0; currentWidth < width; currentWidth++)  //loop through each column
@@ -76,18 +90,21 @@ public class Functions
 					//skip the pixel at (0, 0)
 					continue;
 				}
+				
 				currentPixel = img.getRGB(currentWidth, currentHeight);
+				
+				//red bit loop
 				for(int r = 0; r < redBits && stringBitCounter < bitsNeeded; r++) //change the appropriate number of red bits
 				{
 					currentStringBit = input.charAt(stringBitCounter / 7); //grabs the correct character to be encoded
 					currentStringBit = currentStringBit >> (stringBitCounter % 7); //shift right to the correct position of the character
 					currentStringBit = currentStringBit & 1; //grabs the individual bit		
 					
-					currentPixelBit = (currentPixel >> (r + 16)) & 1;
+					currentPixelBit = (currentPixel >> (r + 16)) & 1; //grabs the current pixel bit
 
 					if(currentStringBit == 0)
 					{
-						if(currentPixelBit == 1) //pixel bit should be changed to a 0
+						if(currentPixelBit == 1) //pixel bit should be changed to a 0, to match the string bit
 						{
 							newPixelValue = currentPixel - (1 << (r + 16)); //1 << (r + 16) is 2^(r + 16)
 							img.setRGB(currentWidth, currentHeight, newPixelValue);
@@ -96,10 +113,8 @@ public class Functions
 					}
 					else //currentStringBit == 1
 					{
-						if(currentPixelBit == 0) //pixel bit should be changed to a 1
+						if(currentPixelBit == 0) //pixel bit should be changed to a 1, to match the string bit
 						{
-						//	System.out.println("how many times i said how many times");
-
 							newPixelValue = currentPixel + (1 << (r + 16)); //1 <<(r + 16) is 2^(r + 16)
 							img.setRGB(currentWidth, currentHeight, newPixelValue);
 							currentPixel = newPixelValue;
@@ -116,22 +131,24 @@ public class Functions
 				}
 				if(stringBitCounter >= bitsNeeded) //whole string has been encoded
 				{
-					//exit both for loops
+					//exits all for-loops, ending the encoding process
 					currentWidth += width;
 					currentHeight += height;
 					break;
 				}
 				
+				
+				//green bit loop
 				for(int g = 0; g < greenBits; g++) //change the appropriate number of green bits
 				{
 					currentStringBit = input.charAt(stringBitCounter / 7); //grabs the correct character to be encoded
 					currentStringBit = currentStringBit >> (stringBitCounter % 7); //shift right to the correct position of the character
 					currentStringBit = currentStringBit & 1; //grabs the individual bit
 					
-					currentPixelBit = (currentPixel >> (g + 8)) & 1;
+					currentPixelBit = (currentPixel >> (g + 8)) & 1; //grabs the current pixel bit
 					if(currentStringBit == 0)
 					{
-						if(currentPixelBit == 1) //pixel bit should be changed to a 0
+						if(currentPixelBit == 1) //pixel bit should be changed to a 0, to match the string bit
 						{
 							newPixelValue = currentPixel - (1 << (g + 8)); //1 << (g + 8) is 2^(g + 8)
 							img.setRGB(currentWidth, currentHeight, newPixelValue);
@@ -140,7 +157,7 @@ public class Functions
 					}
 					else //currentStringBit == 1
 					{
-						if(currentPixelBit == 0) //pixel bit should be changed to a 1
+						if(currentPixelBit == 0) //pixel bit should be changed to a 1, to match the string bit
 						{
 							newPixelValue = currentPixel + (1 << (g + 8)); //1 << (g + 8) is 2^(g + 8)
 							img.setRGB(currentWidth, currentHeight, newPixelValue);
@@ -150,7 +167,7 @@ public class Functions
 					stringBitCounter++;
 					if(stringBitCounter >= bitsNeeded) //whole string has been encoded
 					{
-						//exit both for loops
+						//exits all for-loops, ending the encoding process
 						currentWidth += width;
 						currentHeight += height;
 						break;
@@ -159,21 +176,23 @@ public class Functions
 				
 				if(stringBitCounter >= bitsNeeded) //whole string has been encoded
 				{
-					//exit both for loops
+					//exit both for-loops
 					currentWidth += width;
 					currentHeight += height;
 					break;
 				}
+				
+				//blue bit loop
 				for(int b = 0; b < blueBits; b++) //change the appropriate number of blue bits
 				{
 					currentStringBit = input.charAt(stringBitCounter / 7); //grabs the correct character to be encoded
 					currentStringBit = currentStringBit >> (stringBitCounter % 7); //shift right to the correct position of the character
 					currentStringBit = currentStringBit & 1; //grabs the individual bit
 					
-					currentPixelBit = (currentPixel >> b) & 1;
+					currentPixelBit = (currentPixel >> b) & 1; //grabs the current pixel bit
 					if(currentStringBit == 0)
 					{
-						if(currentPixelBit == 1) //pixel bit should be changed to a 0
+						if(currentPixelBit == 1) //pixel bit should be changed to a 0, to match the string bit
 						{
 							newPixelValue = currentPixel - (1 << b); //1 << b is 2^b
 							img.setRGB(currentWidth, currentHeight, newPixelValue);
@@ -182,7 +201,7 @@ public class Functions
 					}
 					else //currentStringBit == 1
 					{
-						if(currentPixelBit == 0) //pixel bit should be changed to a 1
+						if(currentPixelBit == 0) //pixel bit should be changed to a 1, to match the string bit
 						{
 							newPixelValue = currentPixel + (1 << b); //1 << b is 2^b
 							img.setRGB(currentWidth, currentHeight, newPixelValue);
@@ -192,14 +211,14 @@ public class Functions
 					stringBitCounter++;
 					if(stringBitCounter >= bitsNeeded) //whole string has been encoded
 					{
-						//exit both for loops
+						//exits all for-loops, ending the encoding process
 						currentWidth += width;
 						currentHeight += height;
 						break;
 					}
-				} //end of blue for loop
-			}//end of inner for loop
-		} //end of outer for loop
+				} //end of blue for-loop
+			}//end of inner for-loop
+		} //end of outer for-loop
 		return img;
 	} //end of encode
 	
@@ -245,8 +264,6 @@ public class Functions
 		
 		for(int currentHeight = 0; currentHeight < height; currentHeight++) //loop through each row
 		{
-		//	System.out.println(bitCounter);
-		//	System.out.println("height = " + currentHeight);
 			for(int currentWidth = 0; currentWidth < width; currentWidth++)  //loop through each column
 			{
 				currentPixel = img.getRGB(currentWidth, currentHeight);
@@ -263,7 +280,7 @@ public class Functions
 					
 					//add the bit to the currentInt, using the power of 2
 					currentInt += currentBit * (1 << (bitCounter % 7));
-					//System.out.println(currentInt);
+					
 					bitCounter++;
 					if(bitCounter % 7 == 0) //full char has been decoded
 					{
@@ -278,7 +295,7 @@ public class Functions
 						{
 							bitCounter = 0;
 							sb.append((char) currentInt); //append the char to the StringBuilder
-						//	System.out.print((char) currentInt);
+
 							currentInt = 0; //reset currentInt
 						}
 					}
@@ -306,7 +323,7 @@ public class Functions
 						{
 							bitCounter = 0;
 							sb.append((char) currentInt); //append the char to the StringBuilder
-						//	System.out.print((char) currentInt);
+
 							currentInt = 0; //reset currentInt
 						}
 					}
@@ -334,7 +351,7 @@ public class Functions
 						{
 							bitCounter = 0;
 							sb.append((char) currentInt); //append the char to the StringBuilder
-							//System.out.print((char) currentInt);
+
 							currentInt = 0; //reset currentInt
 						}
 					}
