@@ -107,8 +107,8 @@ public class Functions
 						if(currentPixelBit == 1) //pixel bit should be changed to a 0, to match the string bit
 						{
 							newPixelValue = currentPixel - (1 << (r + 16)); //1 << (r + 16) is 2^(r + 16)
-							img.setRGB(currentWidth, currentHeight, newPixelValue);
-							currentPixel = newPixelValue;
+							img.setRGB(currentWidth, currentHeight, newPixelValue); //updates the pixel value
+							currentPixel = newPixelValue; //updates the currentPixel variable
 						}
 					}
 					else //currentStringBit == 1
@@ -116,27 +116,19 @@ public class Functions
 						if(currentPixelBit == 0) //pixel bit should be changed to a 1, to match the string bit
 						{
 							newPixelValue = currentPixel + (1 << (r + 16)); //1 <<(r + 16) is 2^(r + 16)
-							img.setRGB(currentWidth, currentHeight, newPixelValue);
-							currentPixel = newPixelValue;
+							img.setRGB(currentWidth, currentHeight, newPixelValue); //updates the pixel value
+							currentPixel = newPixelValue; //updates the currentPixel variable
 						}
 					}
-					stringBitCounter++;
-					if(stringBitCounter >= bitsNeeded) //whole string has been encoded
+					stringBitCounter++; //increments the stringBitCounter, meaning that 1 additional bit has been encoded
+					if(stringBitCounter >= bitsNeeded) //check if whole string has been encoded
 					{
-						//exit both for loops
+						//exits all for-loops, ending the encoding process
 						currentWidth += width;
 						currentHeight += height;
 						break;
 					}
 				}
-				if(stringBitCounter >= bitsNeeded) //whole string has been encoded
-				{
-					//exits all for-loops, ending the encoding process
-					currentWidth += width;
-					currentHeight += height;
-					break;
-				}
-				
 				
 				//green bit loop
 				for(int g = 0; g < greenBits; g++) //change the appropriate number of green bits
@@ -172,14 +164,6 @@ public class Functions
 						currentHeight += height;
 						break;
 					}
-				}
-				
-				if(stringBitCounter >= bitsNeeded) //whole string has been encoded
-				{
-					//exit both for-loops
-					currentWidth += width;
-					currentHeight += height;
-					break;
 				}
 				
 				//blue bit loop
