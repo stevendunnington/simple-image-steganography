@@ -206,7 +206,7 @@ public class Functions
 		return img;
 	} //end of encode
 	
-	public static String decode(BufferedImage img)
+	public static String decode(BufferedImage img) //returns the decoded string from an image, will return garbage if the string has not been encoded
 	{
 		StringBuilder sb = new StringBuilder();
 		
