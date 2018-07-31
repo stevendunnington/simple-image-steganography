@@ -28,6 +28,7 @@ import javafx.scene.control.Label;
 
 /*
  * Class: ImgSteg.java
+ * Author: Steven Dunnington
  * Purpose:
  * This class contains everything related to the GUI of the application, as well as
  * user input and output of pictures and text files. The main method is contained in this
@@ -121,7 +122,8 @@ public class ImgSteg extends Application
 				{
 					alert.setTitle("Instructions");
 			        alert.setHeaderText(null);
-			        String instr = "Open Image: Open an image from the file system. The image can be either an encoded image, or a regular non-encoede image.\n"
+			        String instr = "Open Image: Open an image from the file system. The image can be either an encoded image, or a regular non-encoded image.\n"
+			        		+ "Supports .jpg, .bmp, .jpeg, and .png files.\n"
 			        		+ "Open Text File: Opens a text file with text to be encoded. Supports .txt files.\n"
 			        		+"Encode Text From Image: Encodes the text from the text file into the opened image, and displays the "
 			        		+ "encoded image.\nDecode Text From Text File: Decodes any encoded text from an image and displays a preview. May decode nonsense if the image has not been encoded with text.\n"

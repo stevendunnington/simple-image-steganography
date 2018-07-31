@@ -2,6 +2,7 @@ import java.awt.image.BufferedImage;
 
 /*
  * Class: Functions.java
+ * Author: Steven Dunnington
  * Purpose:
  * This class contains two methods, encode and decode. These two
  * methods perform the actual encoding of text into an image, and the decoding
@@ -213,7 +214,6 @@ public class Functions
 		int width = img.getWidth();
 		int height = img.getHeight();
 		
-		int currentInt = 0;
 		int currentBit;
 		
 		//get the RGB bits per pixel from (0, 0)
@@ -225,7 +225,7 @@ public class Functions
 			currentBit = currentBit & 1;
 			bitsPerPixel += (1 << i) * currentBit;
 		}
-		
+		//number of bits used for each color
 		int redBits = 0;
 		int greenBits = 0;
 		int blueBits = 0;
@@ -243,6 +243,7 @@ public class Functions
 
 		
 		int currentPixel = 0;
+		int currentInt = 0;
 		
 		int bitCounter = 0; //counter to determine the placement of each bit, and when the full char has been decoded
 		
@@ -338,13 +339,11 @@ public class Functions
 
 							currentInt = 0; //reset currentInt
 						}
-					}
-				}
-			}
-		}
-		
+					} //end of full char decoded check
+				} //end of blueBits loop
+			} //end of column loop
+		} //end of row loop
 		return sb.toString();
-
 	} //end of decode
 	
 }
